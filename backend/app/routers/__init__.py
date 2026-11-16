@@ -7,6 +7,7 @@
 from __future__ import annotations
 
 from app.routers import endpoint as router_endpoint
+from app.routers import admission as router_admission
 from app.routers import chain as router_chain
 from app.routers import freq as router_freq
 from app.routers import mapper as router_mapper
@@ -25,4 +26,4 @@ from app.routers import log as router_log
 from app.routers import delta as router_delta
 from app.routers import export as router_export
 
-ROUTERS = [router_endpoint, router_chain, router_freq, router_mapper, router_validator, router_retry, router_aggregator, router_auth, router_cache, router_dump, router_schedule, router_monitor, router_transform, router_cleanse, router_ratelimit, router_log, router_delta, router_export]
+ROUTERS = [router_endpoint, router_admission, router_chain, router_freq, router_mapper, router_validator, router_retry, router_aggregator, router_auth, router_cache, router_dump, router_schedule, router_monitor, router_transform, router_cleanse, router_ratelimit, router_log, router_delta, router_export]

@@ -30,6 +30,10 @@ class EndpointService:
         start = max(page - 1, 0) * size
         return rows[start:start + size], total
 
+    def list_todos(self) -> list[dict[str, Any]]:
+        """接口管理待办区：接住端点接入清单回写的待处理端点与认证失败项。"""
+        return [row for row in store.rows(MODULE) if row.get("pending")]
+
     def get_entry(self, entry_id: int) -> dict[str, Any] | None:
         return store.find(MODULE, entry_id)
 

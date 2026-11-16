@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 import Overview from '@/views/Overview.vue'
 const Endpoint = () => import('@/views/endpoint/index.vue')
+const Admission = () => import('@/views/admission/index.vue')
 const Chain = () => import('@/views/chain/index.vue')
 const Freq = () => import('@/views/freq/index.vue')
 const Mapper = () => import('@/views/mapper/index.vue')
@@ -25,6 +26,7 @@ const router = createRouter({
   routes: [
     { path: '/', name: 'overview', component: Overview },
     { path: '/endpoint', name: 'endpoint', component: Endpoint },
+    { path: '/admission', name: 'admission', component: Admission },
     { path: '/chain', name: 'chain', component: Chain },
     { path: '/freq', name: 'freq', component: Freq },
     { path: '/mapper', name: 'mapper', component: Mapper },

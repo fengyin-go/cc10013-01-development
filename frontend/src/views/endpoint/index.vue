@@ -18,6 +18,38 @@
       </article>
     </div>
 
+    <section class="todo-panel">
+      <h3 class="block-title">接口管理待办区（接入清单回写）</h3>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>端点编号</th>
+            <th>状态</th>
+            <th>认证失败标记</th>
+            <th>准入回执</th>
+            <th>失败/隔离原因</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="row in todoRows" :key="`todo-${String(row.id)}`">
+            <td>{{ row['端点编号'] ?? '—' }}</td>
+            <td><em class="badge" :class="statusBadge(row.status)">{{ row.status ?? '—' }}</em></td>
+            <td>
+              <em v-if="row['认证失败标记']" class="badge badge-danger">认证失败</em>
+              <span v-else class="muted-text">正常</span>
+            </td>
+            <td>{{ row['准入回执'] || '—' }}</td>
+            <td :class="{ 'cell-warn': row['失败原因'] || row['隔离原因'] }">
+              {{ row['失败原因'] || row['隔离原因'] || row['待裁决冲突'] || '—' }}
+            </td>
+          </tr>
+          <tr v-if="!todoRows.length">
+            <td colspan="5" class="empty-state">待办区暂无待处理端点，可在「端点接入清单」发起批量准入</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
     <form class="filter-bar" @submit.prevent="reload">
       <label v-for="field in filterFields" :key="field" class="filter-item">
         <span>{{ field }}</span>
@@ -76,10 +108,18 @@ const statuses = ["草稿", "待校验", "已激活", "已停用"]
 const stats = [{"label": "API端点总数", "value": 0}, {"label": "已激活端点", "value": 0}, {"label": "待校验端点", "value": 0}]
 
 const rows = ref<Row[]>([])
+const todoRows = ref<Row[]>([])
 const total = ref(0)
 const errorMessage = ref('')
 const filters = ref<Record<string, string>>({})
 const filterFields = columns.slice(0, 3)
+
+function statusBadge(value: unknown): string {
+  if (value === '已激活') return 'badge-ok'
+  if (value === '认证失败' || value === '已停用') return 'badge-danger'
+  if (value === '待校验') return 'badge-warn'
+  return 'badge-muted'
+}
 
 function resetFilters() {
   filters.value = {}
@@ -114,13 +154,20 @@ async function reload() {
   errorMessage.value = ''
   const query = new URLSearchParams(filters.value as Record<string, string>).toString()
   try {
-    const response = await request(`${ENDPOINT}?${query}`)
-    if (!response.ok) {
+    const [listResp, todoResp] = await Promise.all([
+      request(`${ENDPOINT}?${query}`),
+      request(`${ENDPOINT}/todo`),
+    ])
+    if (!listResp.ok) {
       throw new Error('API端点列表读取失败')
     }
-    const payload = await response.json()
+    const payload = await listResp.json()
     rows.value = payload.items ?? []
     total.value = payload.total ?? rows.value.length
+    if (todoResp.ok) {
+      const todoPayload = await todoResp.json()
+      todoRows.value = todoPayload.items ?? []
+    }
   } catch (error) {
     errorMessage.value = error instanceof Error ? error.message : '接口管理列表读取失败'
   }

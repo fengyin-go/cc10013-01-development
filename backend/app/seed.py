@@ -651,5 +651,50 @@ SEED_ROWS: dict[str, list[dict[str, Any]]] = {
   '传输协议': '数据导出样例3',
   '频率限制': '数据导出样例3',
   '加密开关': '数据导出样例3',
-  '完整性校验': '数据导出样例3'}]
+  '完整性校验': '数据导出样例3'}],
+    # 采集端点配置：批量准入的输入侧。处理状态初始均为「未处理」，准入后由 service 回写。
+    "collect_endpoint": [
+        {'id': 1, '端点编号': 'EP-201', '接口地址': 'https://api.partner-a.com/v1/orders/',
+         '请求方法': 'GET', '认证模板': 'Header-9', '认证类型': 'ApiKey',
+         '认证请求头': 'X-Api-Key', '认证密钥': 'ak-201-9f3a', '迁移批次': 'BATCH-2026-09',
+         '处理状态': '未处理', 'pending': True, 'abnormal': False},
+        {'id': 2, '端点编号': 'EP-202', '接口地址': 'http://legacy.partner-b.net:80/api/data?b=2&a=1',
+         '请求方法': 'POST', '认证模板': 'legacy-auth', '认证类型': 'Basic',
+         '认证请求头': 'Authorization', '认证密钥': '', '迁移批次': 'BATCH-2026-09',
+         '处理状态': '未处理', 'pending': True, 'abnormal': False},
+        {'id': 3, '端点编号': 'EP-203', '接口地址': 'https://api.partner-c.com/v2/users',
+         '请求方法': 'GET', '认证模板': 'Bearer-OAuth2', '认证类型': 'BearerToken',
+         '认证请求头': 'Authorization', '认证密钥': 'bearer-203-77c1', '迁移批次': 'BATCH-2026-09',
+         '处理状态': '未处理', 'pending': True, 'abnormal': False},
+        # 与 id=1 同一端点编号，主机大小写、默认端口、尾斜杠差异规范化后必须判重
+        {'id': 4, '端点编号': 'EP-201', '接口地址': 'https://API.PARTNER-A.COM:443/v1/orders/',
+         '请求方法': 'GET', '认证模板': 'Header-9', '认证类型': 'ApiKey',
+         '认证请求头': 'X-Api-Key', '认证密钥': 'ak-201-dup', '迁移批次': 'BATCH-2026-09',
+         '处理状态': '未处理', 'pending': True, 'abnormal': False},
+        # 接口地址非法，认证参数本身完整，隔离原因应指向地址而非认证
+        {'id': 5, '端点编号': 'EP-205', '接口地址': 'http://api.partner-d .com/feed',
+         '请求方法': 'GET', '认证模板': 'Header-9', '认证类型': 'ApiKey',
+         '认证请求头': 'X-Api-Key', '认证密钥': 'ak-205-x2', '迁移批次': 'BATCH-2026-10',
+         '处理状态': '未处理', 'pending': True, 'abnormal': False},
+        # 认证模板等认证信息整体缺失，必须单独退回
+        {'id': 6, '端点编号': 'EP-206', '接口地址': 'https://api.partner-e.com/v1/feed',
+         '请求方法': 'GET', '认证模板': '', '认证类型': '',
+         '认证请求头': '', '认证密钥': '', '迁移批次': 'BATCH-2026-10',
+         '处理状态': '未处理', 'pending': True, 'abnormal': False},
+        {'id': 7, '端点编号': 'EP-207', '接口地址': 'https://api.partner-f.com/v1/sales',
+         '请求方法': 'GET', '认证模板': 'Token-7', '认证类型': 'BearerToken',
+         '认证请求头': 'Authorization', '认证密钥': 'tok-207-aa01', '迁移批次': 'BATCH-2026-10',
+         '处理状态': '未处理', 'pending': True, 'abnormal': False},
+        # 同一新迁移批次内出现两套完整认证模板：先到者接入，后到者待裁决
+        {'id': 8, '端点编号': 'EP-209', '接口地址': 'https://api.partner-g.com/sign',
+         '请求方法': 'GET', '认证模板': 'SigV4-Tpl', '认证类型': 'AwsSigV4',
+         '认证请求头': 'X-Amz-Signature', '认证密钥': 'sig-209-55dd', '迁移批次': 'BATCH-2026-11',
+         '处理状态': '未处理', 'pending': True, 'abnormal': False},
+        {'id': 9, '端点编号': 'EP-210', '接口地址': 'https://api.partner-h.com/profile',
+         '请求方法': 'GET', '认证模板': 'Header-9', '认证类型': 'ApiKey',
+         '认证请求头': 'X-Api-Key', '认证密钥': 'ak-210-77e', '迁移批次': 'BATCH-2026-11',
+         '处理状态': '未处理', 'pending': True, 'abnormal': False},
+    ],
+    # 端点接入清单数据集：由批量准入动作生成，初始为空，运营人员重新进入工作台仍可核对
+    "admission": [],
 }

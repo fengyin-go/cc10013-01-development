@@ -13,7 +13,7 @@ router = APIRouter(prefix="/api/endpoint", tags=["接口管理"])
 service = EndpointService()
 
 LIST_FIELDS = ["端点编号", "接口地址", "请求方法", "认证方式", "请求头配置", "参数模板", "响应格式", "超时秒数"]
-STATUSES = ["草稿", "待校验", "已激活", "已停用"]
+STATUSES = ["草稿", "待校验", "已激活", "已停用", "认证失败"]
 
 
 @router.get("", response_model=PageResult[dict])
@@ -28,6 +28,13 @@ def list_entries(
         raise HTTPException(status_code=400, detail="每页最多 200 条，请缩小分页范围")
     items, total = service.list_entries(keyword=keyword, status=status, page=page, size=size)
     return PageResult(items=items, total=total, page=page, size=size)
+
+
+@router.get("/todo", response_model=dict)
+def list_todos() -> dict[str, Any]:
+    """接口管理待办区：接入清单回写的待处理端点与认证失败项都在这里可见。"""
+    items = service.list_todos()
+    return {"module": "endpoint", "total": len(items), "items": items}
 
 
 @router.get("/{entry_id}", response_model=dict)

@@ -28,6 +28,21 @@ class EntryPayload(BaseModel):
     remark: str | None = None
 
 
+class BatchAdmitPayload(BaseModel):
+    """批量统一准入：多选的采集端点配置 ID 集合。"""
+
+    source_ids: list[int] = Field(default_factory=list)
+    remark: str | None = None
+
+
+class ConflictResolvePayload(BaseModel):
+    """冲突裁决：adopt 采纳指定模板接入，reject 退回隔离。"""
+
+    decision: str
+    chosen_template: str | None = None
+    remark: str | None = None
+
+
 
 class EndpointEntry(BaseModel):
     """API端点明细结构。"""
